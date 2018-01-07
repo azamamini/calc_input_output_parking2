@@ -1,0 +1,119 @@
+ private void calchours()
+        {
+			//col5 datein shamsi
+			//col6 timein
+			//col7 dateout shamsi
+			//col8 timeout
+			//from 5am to 9pm :day
+			//from 9pm to 5am :night
+			//drow.Cells[13] :totaltimenight
+			//drow.Cells[14] :totaltimeday
+
+            
+                foreach (DataGridViewRow drow in dataGridView1.Rows)
+                {
+                    try
+                    {
+                        if (drow.Cells[5].Value != null && drow.Cells[6].Value != null && drow.Cells[7].Value != null && drow.Cells[8].Value != null)
+                        {
+                            DateTime col5 = Convert.ToDateTime(ftolnew(drow.Cells[5].Value.ToString().Trim()));
+                            DateTime newdatetime1 = col5;
+                            try
+                            {
+                                DateTime col6 = Convert.ToDateTime(drow.Cells[6].Value.ToString().Trim());
+                                
+                                DateTime newdatetime3 = new DateTime(col5.Year, col5.Month, col5.Day, col6.Hour, col6.Minute, col6.Second);
+                                newdatetime1 = newdatetime3;
+                            }
+                            catch
+                            {
+                                DateTime newdatetime3 = new DateTime(col5.Year, col5.Month, col5.Day, Convert.ToInt32(drow.Cells[25].Value.ToString().Substring(0, 2)), Convert.ToInt32(drow.Cells[25].Value.ToString().Substring(3, 2)), 0);
+                                newdatetime1 = newdatetime3;
+
+                            }
+                            DateTime col7 = Convert.ToDateTime(ftolnew(drow.Cells[7].Value.ToString().Trim()));
+                            DateTime newdatetime2 = col7;
+                            try
+                            {
+                                DateTime col8 = Convert.ToDateTime(drow.Cells[8].Value.ToString().Trim());
+                                DateTime newdatetime4 = new DateTime(col7.Year, col7.Month, col7.Day, col8.Hour, col8.Minute, col8.Second);
+                                newdatetime2 = newdatetime4;
+                            }
+                            catch
+                            {
+                                DateTime newdatetime4 = new DateTime(col7.Year, col7.Month, col7.Day, Convert.ToInt32(drow.Cells[26].Value.ToString().Substring(0, 2)), Convert.ToInt32(drow.Cells[26].Value.ToString().Substring(3, 2)), 0);
+                                newdatetime2 = newdatetime4;
+                            }
+                            
+                            DateTime date1 = newdatetime1;
+                            DateTime date = newdatetime1;
+                            int dayh = 0;
+                            int nighth = 0;
+							//main part of function to seperate and calculate total day & night used parking
+                            while (date < newdatetime2)
+                            {
+								//day time
+                                if (date.TimeOfDay.Hours < 21 && date.TimeOfDay.Hours >= 5)
+                                {
+                                    dayh = dayh + 1;
+                                }
+								//night time
+                                if (date.TimeOfDay.Hours >= 21 || date.TimeOfDay.Hours < 5)
+                                {
+                                    nighth = nighth + 1;
+                                }
+                                date1 = date;
+                                date = date.AddMinutes(1);
+
+                            }
+                            //-----------
+                            decimal totd = 0;
+                            decimal totn = 0;
+                            decimal ff1 = (decimal)dayh / 60;
+                            decimal vv1 = (decimal)dayh % 60;
+                            ff1 = ((decimal)dayh - vv1) / 60;
+							//more than 30 min = 60 min
+							//less than 30 min = 30 min
+                            if (vv1 < 30 && vv1 > 0)
+                                vv1 = 30;
+                            if (vv1 > 30)
+                                vv1 = 60;
+                            totd = Math.Round((ff1 * 60 + vv1) / 60, 1);
+
+                            ff1 = (decimal)nighth / 60;
+                            vv1 = (decimal)nighth % 60;
+                            ff1 = ((decimal)nighth - vv1) / 60;
+
+                            if (vv1 < 30 && vv1 > 0)
+                                vv1 = 30;
+                            if (vv1 > 30)
+                                vv1 = 60;
+                            totn = Math.Round((ff1 * 60 + vv1) / 60, 1);
+                            drow.Cells[13].Value = totn;
+                            drow.Cells[14].Value = totd;
+
+                        }
+                    }
+                    catch
+                    {
+                    } 
+                }
+            
+        }
+
+		//function used for convert persian date to date
+ public string ftolnew(string cparm)
+ {
+	 string cTemp = "";
+	 string Tarikh = cparm;
+	 int Rooz = int.Parse(Tarikh.Substring(8, 2));
+	 int Maah = int.Parse(Tarikh.Substring(5, 2));
+	 int Saal = int.Parse(Tarikh.Substring(0, 4));
+	 System.Globalization.PersianCalendar pc = new System.Globalization.PersianCalendar();
+
+	 
+	 cTemp = pc.ToDateTime(Saal, Maah, Rooz, 0, 0, 0, 0).ToString();
+
+	 return cTemp;
+
+ }
